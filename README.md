@@ -1,6 +1,12 @@
-# AgentSeed
+<div align="center">
+
+![AgentSeed](./pic/image.png)
+
+# AgentSeed —— 从零开始的Agent开发教程
 
 > 播下一颗种子，期待它长成参天大树的那天。
+
+</div>
 
 AgentSeed 是一个从零开始构建 AI Agent 的渐进式教学项目。
 
@@ -31,6 +37,7 @@ AgentSeed 希望提供一条清晰的学习路径：不从庞大的框架开始�
 - **每步都可运行**：切换到关键提交后，可以观察该阶段新增的能力。
 - **先实践，再抽象**：抽象从已经运行的代码中产生，而不是提前设计复杂框架。
 - **覆盖完整链路**：从命令行模型调用，逐步扩展到 Web、RAG、Skill、MCP 和 Eval。
+- **使用 Anthropic 示例**：当前代码和教程统一以 Anthropic Messages API 为例。
 
 ## 如何学习
 
@@ -43,24 +50,13 @@ AgentSeed 希望提供一条清晰的学习路径：不从庞大的框架开始�
 
 你可以跟随主分支持续阅读，也可以切换到某个提交，查看 Agent 是如何一步步构建出来的。
 
-## 学习路线
-
-```text
-LLM 对话
-→ Agent 的执行、存储与检索
-→ 格式转换与可观测性
-→ Skill 技能系统
-→ MCP 协议接入
-→ 评测与最终整合
-```
-
 ### 第一章：LLM 对话
 
 从一次普通的 HTTP 请求开始，理解应用如何与大语言模型通信。
 
 主要内容：
 
-- 调用 OpenAI-compatible 模型接口；
+- 调用 Anthropic Messages API 兼容接口；
 - 理解 System、User、Assistant 消息角色；
 - 保存消息并实现上下文记忆；
 - 抽象模型客户端；
@@ -170,3 +166,14 @@ LLM 对话
 AgentSeed 最终会形成一个完整但最小的 AI Agent 参考实现：它能够与模型对话、维护上下文、调用工具、等待人工审批、保存与恢复状态、检索外部知识、加载 Skill、连接 MCP Server，并通过 Trace 和 Eval 观察与验证自己的执行过程。
 
 更重要的是，项目会完整保留它从一颗种子逐步生长起来的过程。
+
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Nick-Hogo/AgentSeed&type=date&legend=top-left)](https://www.star-history.com/#Nick-Hogo/AgentSeed&type=date&legend=top-left)
+
+
+## 相关链接
+
+- [Linux.do](https://linux.do/)：连接开发者与 AI 爱好者的社区。
+- [AgentSeed GitHub](https://github.com/Nick-Hogo/AgentSeed)：项目源码与教程。
