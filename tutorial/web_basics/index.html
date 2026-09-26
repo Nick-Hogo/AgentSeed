@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome Page</title>
+
+    <style>
+      /* CSS 负责网页的外观：字体、对齐方式、间距和颜色。 */
+      body {
+        font-family: sans-serif;
+        text-align: center;
+      }
+
+      /* 设置输入框的内边距、边框和圆角。 */
+      input {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+      }
+
+      /* 设置发送按钮的大小、颜色和鼠标样式。 */
+      button {
+        padding: 8px 16px;
+        border: 0;
+        border-radius: 6px;
+        color: white;
+        background: #4e9af5;
+        cursor: pointer;
+      }
+
+      /* 给标题增加渐变色和动画效果，和交互逻辑无关。 */
+      h1 {
+        margin-bottom: 24px;
+        background: linear-gradient(90deg, #ff4d6d, #ff9f1c, #2ec4b6, #4361ee, #b5179e);
+        background-size: 300% auto;
+        color: transparent;
+        font-size: 56px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        -webkit-background-clip: text;
+        background-clip: text;
+        text-shadow: 0 4px 16px rgba(67, 97, 238, 0.2);
+        animation: gradient-flow 5s linear infinite;
+      }
+
+      @keyframes gradient-flow {
+        to {
+          background-position: 300% center;
+        }
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <!-- HTML 负责搭建页面结构：标题、输入框和按钮。 -->
+    <div>
+      <!-- JavaScript 会根据 id 找到并修改这个标题。 -->
+      <h1 id="title">Hello World</h1>
+
+      <!-- 用户在输入框中填写要处理的内容。 -->
+      <input id="content" type="text" placeholder="输入内容" />
+      <!-- 点击按钮后，下面的 JavaScript 逻辑会被触发。 -->
+      <button id="send-button" type="button">发送</button>
+    </div>
+
+    <script>
+      // 先找到页面中需要操作的三个元素。
+      const title = document.querySelector("#title");
+      const content = document.querySelector("#content");
+      const sendButton = document.querySelector("#send-button");
+
+      // 监听按钮点击：读取输入，转成大写，再更新标题。
+      sendButton.addEventListener("click", () => {
+        const value = content.value.trim();
+
+        // 输入为空时不更新页面。
+        if (!value) {
+          return;
+        }
+
+        // 将输入内容转换成大写，并显示在标题中。
+        title.textContent = value.toUpperCase();
+      });
+    </script>
+  </body>
+</html>
