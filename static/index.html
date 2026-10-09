@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FoxChat · AgentSeed</title>
+  <style>
+    :root {
+      --paper: #fffdf6;
+      --paper-deep: #fbf7eb;
+      --ink: #27221e;
+      --muted: #81786d;
+      --line: #eadfcb;
+      --green: #3f9d48;
+      --green-dark: #25823a;
+      --blue: #4e9af5;
+      --shadow: 0 8px 24px rgb(94 71 38 / 7%);
+      --ui-font: "Yuanti SC", "Hiragino Sans GB", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      font-family: var(--ui-font);
+      font-weight: 700;
+      background: #f7f4e9;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 1120px; font-family: var(--ui-font); font-weight: 700; background:
+      radial-gradient(circle at 9% 12%, rgb(230 242 207 / 58%), transparent 23rem),
+      radial-gradient(circle at 94% 83%, rgb(255 233 204 / 55%), transparent 25rem),
+      #f8f5ea; }
+    button, input { font: inherit; }
+    button { border: 0; cursor: pointer; }
+    .app { height: 100vh; min-height: 680px; display: grid; grid-template-rows: 82px minmax(0, 1fr); overflow: hidden; }
+    body.font-hand { --ui-font: "Kaiti SC", "STKaiti", "Yuanti SC", serif; }
+    body.font-mixed { --ui-font: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; }
+    body.font-bold { --ui-font: "Yuanti SC", "Hiragino Sans GB", sans-serif; font-weight: 700; }
+    /* 本机可用的圆体中，Yuanti SC 最接近汉仪正圆一类的柔和字形。 */
+    body.font-soft { --ui-font: "Yuanti SC", "Hiragino Sans GB", sans-serif; font-weight: 600; letter-spacing: .012em; }
+
+    /* Header */
+    .topbar { display: grid; grid-template-columns: 340px minmax(320px, 1fr) 430px; align-items: center; gap: 16px; padding: 0 22px; overflow: hidden; background: rgb(255 253 247 / 88%); border-bottom: 1px solid var(--line); }
+    .brand { width: 320px; height: 80px; overflow: hidden; display: flex; align-items: center; }
+    .brand img { width: 320px; height: 80px; display: block; object-fit: cover; }
+    .slogan { justify-self: center; width: min(430px, 100%); height: 66px; overflow: hidden; }
+    .slogan img { width: 100%; height: 66px; display: block; object-fit: cover; }
+    .top-actions { display: flex; align-items: center; justify-content: flex-end; gap: 16px; }
+    .search { height: 42px; width: 300px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border: 1px solid #decfb8; border-radius: 24px; background: #fff; color: #827a70; }
+    .search svg { width: 19px; flex: 0 0 auto; }
+    .search input { min-width: 0; width: 100%; border: 0; outline: 0; color: var(--ink); background: transparent; font-size: 14px; }
+    .theme { font-size: 24px; background: transparent; }
+    .profile { display: flex; align-items: center; gap: 8px; white-space: nowrap; font-weight: 700; }
+    .avatar { width: 42px; height: 42px; object-fit: cover; border-radius: 50%; }
+    .avatar.large { width: 56px; height: 56px; }
+
+    /* Three-column workspace */
+    .workspace { min-height: 0; display: grid; grid-template-columns: 300px minmax(500px, 1fr) 330px; gap: 9px; padding: 8px 10px 10px; }
+    .panel { min-height: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 22px; background: rgb(255 254 248 / 89%); box-shadow: var(--shadow); }
+
+    /* Left navigation */
+    .sidebar-left { position: relative; display: flex; min-height: 0; flex-direction: column; padding: 17px 14px 0; }
+    .new-chat { height: 54px; display: flex; align-items: center; gap: 12px; padding: 0 17px; border-radius: 16px; color: #fff; background: linear-gradient(135deg, #3a9c42, #69b95d); box-shadow: inset 0 1px rgb(255 255 255 / 28%), 0 5px 10px rgb(45 135 54 / 16%); font-weight: 800; font-size: 18px; }
+    .plus { width: 29px; height: 29px; display: grid; place-items: center; border-radius: 50%; background: #188638; font-size: 24px; line-height: 1; }
+    .nav { margin: 13px 0 12px; display: grid; gap: 4px; }
+    .nav-item { height: 43px; display: flex; align-items: center; gap: 14px; padding: 0 13px; border-radius: 13px; font-size: 16px; font-weight: 700; }
+    .nav-item:hover { background: #f2f5ed; }
+    .nav-item.active { color: #23579e; background: #dfeeff; }
+    .nav-icon { width: 24px; text-align: center; font-size: 20px; }
+    .section-heading { display: flex; justify-content: space-between; margin: 8px 10px 6px; color: #766d62; font-weight: 700; font-size: 14px; }
+    .history { min-height: 0; overflow: auto; padding-bottom: 126px; }
+    .history-item { display: grid; grid-template-columns: 39px minmax(0, 1fr) auto; align-items: center; gap: 9px; padding: 9px 8px; border-radius: 13px; }
+    .history-item:hover { background: #f5f1e8; }
+    .history-item.active { background: #dfeeff; }
+    .history-icon { width: 37px; height: 37px; display: grid; place-items: center; border-radius: 50%; background: #fff; font-size: 20px; }
+    .history-icon img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .history-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 800; }
+    .history-preview { margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #938a80; font-size: 12px; }
+    .history-time { align-self: start; padding-top: 2px; color: #8d857b; font-size: 12px; }
+    .sidebar-decoration { position: absolute; z-index: 2; right: 4px; bottom: 0; left: 3px; pointer-events: none; }
+    .sidebar-decoration img { display: block; width: 100%; height: auto; }
+
+    /* Chat */
+    .chat { display: grid; grid-template-rows: 94px minmax(0, 1fr) 74px; }
+    .chat-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 21px; border-bottom: 1px solid #eee5d6; background: linear-gradient(90deg, #fffef9 52%, #f2f7e8); }
+    .chat-person { display: flex; align-items: center; gap: 12px; }
+    .chat-title { font-size: 20px; font-weight: 900; }
+    .status { display: flex; align-items: center; gap: 7px; margin-top: 4px; color: #827a70; font-size: 14px; }
+    .status-dot { width: 9px; height: 9px; border-radius: 50%; background: #38a855; }
+    .chat-header-art { width: 44%; max-width: 330px; }
+    .chat-header-art img { width: 100%; display: block; }
+    .messages { min-height: 0; overflow: auto; padding: 12px 24px 24px; scroll-behavior: smooth; }
+    .message { display: flex; align-items: flex-start; gap: 11px; margin: 0 0 12px; }
+    .message.user { justify-content: flex-end; }
+    .message-content { max-width: min(700px, 83%); }
+    .bubble { padding: 12px 16px; border-radius: 18px; line-height: 1.65; font-size: 16px; white-space: pre-wrap; }
+    .message.assistant .bubble { background: #fff8eb; border: 1px solid #f0e5d1; border-top-left-radius: 7px; }
+    .message.user .bubble { background: #dcecff; border: 1px solid #c3ddfb; border-top-right-radius: 7px; }
+    .message-time { display: block; margin-top: 5px; color: #8290a1; text-align: right; font-size: 12px; }
+    .code-window { margin-top: 10px; overflow: hidden; border-radius: 14px; background: #202b35; box-shadow: 0 8px 18px rgb(28 38 49 / 16%); }
+    .code-top { height: 31px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 12px; background: #293845; color: #cbd5dd; font-size: 12px; }
+    .code-copy { margin-left: auto; padding: 4px 8px; border: 1px solid rgb(255 255 255 / 18%); border-radius: 7px; color: #dbe4eb; background: rgb(255 255 255 / 8%); font-size: 12px; }
+    .code-copy:hover { background: rgb(255 255 255 / 16%); }
+    .markdown-table { width: 100%; margin: 10px 0; border-collapse: collapse; border: 1px solid #e5d9c8; border-radius: 10px; background: #fffdf8; font-size: 14px; white-space: normal; }
+    .markdown-table th, .markdown-table td { padding: 8px 10px; border: 1px solid #eadfce; text-align: left; vertical-align: top; }
+    .markdown-table th { color: #4b3929; background: #fff0d8; font-weight: 800; }
+    .markdown-table tr:nth-child(even) td { background: #fffaf1; }
+    .traffic { display: flex; gap: 6px; }
+    .traffic i { width: 11px; height: 11px; border-radius: 50%; }
+    .traffic i:nth-child(1) { background: #fa655f; } .traffic i:nth-child(2) { background: #f5bd47; } .traffic i:nth-child(3) { background: #5bc779; }
+    pre { margin: 0; overflow: auto; padding: 13px 16px 15px; color: #e9eef2; font: 16px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .kw { color: #df8cf4; } .fn { color: #75c8ff; } .str { color: #9bda91; } .num { color: #f0c36d; } .cm { color: #8b98a2; }
+    .tip { margin-top: 10px; padding: 11px 13px; border: 1px solid #a8d58f; border-radius: 14px; background: #eef9df; }
+    .tip strong { font-size: 16px; } .tip p { margin: 6px 0; font-size: 14px; }
+    .tip code { display: block; padding: 7px 9px; border-radius: 8px; background: rgb(255 255 255 / 82%); font-size: 12px; }
+    .composer-wrap { padding: 10px 15px 12px; border-top: 1px solid #eee5d9; background: rgb(255 255 255 / 72%); }
+    .composer { height: 54px; display: grid; grid-template-columns: 42px minmax(0, 1fr) 42px 100px; align-items: center; gap: 2px; padding: 0 7px; border: 1.5px solid #cfc9be; border-radius: 30px; background: #fff; }
+    .round-button { width: 38px; height: 38px; border-radius: 50%; background: transparent; font-size: 20px; }
+    .round-button:hover { background: #f2f0eb; }
+    #content { width: 100%; height: 100%; padding: 0 8px; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 14px; }
+    #send-button { height: 41px; border-radius: 22px; color: #fff; background: linear-gradient(135deg, #55a2fa, #3b83ee); font-weight: 800; }
+    #send-button:disabled { cursor: wait; opacity: .62; }
+    #error { margin: 3px 8px 0; color: #bd5747; font-size: 12px; }
+
+    /* Right tools */
+    .sidebar-right { display: grid; place-items: center; overflow: auto; padding: 24px; }
+    .coming-soon { width: 100%; padding: 30px 20px; border: 1.5px dashed #dca86c; border-radius: 20px; background: #fff5e4; text-align: center; transform: rotate(-1deg); }
+    .coming-soon img { width: 150px; max-width: 80%; margin: 0 auto 12px; display: block; }
+    .coming-soon-title { color: #5a3924; font-size: 20px; font-weight: 900; }
+    .coming-soon-text { margin: 10px 0 0; color: #85776a; font-size: 14px; line-height: 1.8; }
+    .helper-banner { position: relative; min-height: 66px; display: grid; place-items: center; margin: 2px 0 15px; padding: 13px 34px 13px 14px; border: 1.5px dashed #dca86c; border-radius: 15px; background: #fff1dc; transform: rotate(-1deg); text-align: center; font-size: 16px; font-weight: 900; }
+    .helper-banner::after { content: "🌱"; position: absolute; right: 8px; bottom: -11px; font-size: 24px; }
+    .helper-banner img { position: absolute; right: 8px; bottom: -8px; width: 44px; height: 44px; object-fit: cover; border-radius: 50%; }
+    .tools { display: grid; gap: 9px; }
+    .tool-card { display: grid; grid-template-columns: 49px minmax(0, 1fr) 22px; align-items: center; gap: 9px; min-height: 71px; padding: 9px; border: 1px solid #e6dac8; border-radius: 16px; background: rgb(255 255 255 / 75%); text-align: left; }
+    .tool-card:hover { background: #fff; transform: translateX(2px); }
+    .tool-icon { width: 45px; height: 45px; display: grid; place-items: center; border-radius: 50%; font-size: 24px; }
+    .yellow { background: #fff2d7; } .blue { background: #e4f0ff; } .green { background: #e6f6e4; } .purple { background: #f0e6ff; }
+    .tool-title { font-size: 16px; font-weight: 900; } .tool-subtitle { margin-top: 3px; color: #857d73; font-size: 12px; }
+    .chevron { color: #4e4b47; font-size: 24px; }
+    .divider { margin: 17px 0 14px; border-top: 1px dashed #d9cdb9; }
+    .try-title { margin-bottom: 10px; font-size: 16px; font-weight: 900; }
+    .prompt-pill { height: 36px; display: flex; align-items: center; gap: 9px; margin-bottom: 8px; padding: 0 14px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .prompt-pill:hover { transform: translateX(3px); } .pill-green { background: #e5f4db; } .pill-blue { background: #e1efff; color: #235ca5; } .pill-purple { background: #eee4ff; color: #6846a1; }
+    .ask-banner { margin-top: 12px; } .ask-banner img { display: block; width: 100%; }
+    /* 提高界面文字的阅读舒适度，代码区保持紧凑以便查看长代码。 */
+    .search input { font-size: 16px; }
+    .status { font-size: 14px; }
+    .bubble { font-size: 16px; }
+    .history-preview, .history-time, .tool-subtitle { font-size: 12px; }
+    .prompt-pill { font-size: 14px; }
+    #error { font-size: 12px; }
+
+    @media (max-width: 1280px) { .topbar { grid-template-columns: 300px minmax(260px, 1fr) 360px; } .search { width: 230px; } .workspace { grid-template-columns: 260px minmax(500px, 1fr) 290px; } .brand, .brand img { width: 285px; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="FoxChat 首页"><img src="/assets/branding/foxchat-logo.png" alt="FoxChat，让好奇心有答案" /></a>
+      <div class="slogan"><img src="/assets/illustrations/ai-chat-banner.png" alt="和 AI 聊天，让好奇心有答案！" /></div>
+      <div class="top-actions">
+        <label class="search" aria-label="搜索">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input placeholder="搜索对话、文件或功能..." />
+        </label>
+        <button class="theme" type="button" aria-label="切换主题">☀️</button>
+        <div class="profile"><img class="avatar" src="/assets/avatars/assistant-fox.png" alt="" /> Nick <span aria-hidden="true">⌄</span></div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="sidebar-left panel">
+        <button class="new-chat" type="button" onclick="contentInput.focus()"><span class="plus">+</span>新建对话</button>
+        <nav class="nav" aria-label="主导航">
+          <div class="nav-item"><span class="nav-icon">⌂</span>首页</div>
+          <div class="nav-item active"><span class="nav-icon">▤</span>对话记录</div>
+          <div class="nav-item"><span class="nav-icon">♡</span>我的收藏</div>
+          <div class="nav-item"><span class="nav-icon">▦</span>探索发现</div>
+        </nav>
+        <div class="section-heading"><span>最近的对话</span><span>•••</span></div>
+        <div class="history"></div>
+        <div class="sidebar-decoration" aria-hidden="true"><img src="/assets/illustrations/fox-question-garden.png" alt="" /></div>
+      </aside>
+
+      <section class="chat panel">
+        <header class="chat-header">
+          <div class="chat-person"><img class="avatar large" src="/assets/avatars/assistant-fox.png" alt="FoxChat" /><div><div class="chat-title">和 FoxChat 聊天中 ✨</div><div class="status"><span class="status-dot"></span>随时为你提供帮助！</div></div></div>
+          <div class="chat-header-art"><img src="/assets/illustrations/possibilities-banner.png" alt="好问题，会带来新的可能！" /></div>
+        </header>
+        <div id="messages" class="messages" aria-live="polite"></div>
+        <form id="message-form" class="composer-wrap">
+          <div class="composer"><button class="round-button" type="button" aria-label="添加附件">📎</button><input id="content" name="content" autocomplete="off" placeholder="输入你的问题，和 FoxChat 聊聊吧..." required /><button class="round-button" type="button" aria-label="选择表情">☺</button><button id="send-button" type="submit">➤ 发送</button></div><p id="error" role="alert"></p>
+        </form>
+      </section>
+
+      <aside class="sidebar-right panel">
+        <div class="coming-soon">
+          <img src="/assets/illustrations/ask-me-banner.png" alt="" aria-hidden="true" />
+          <div class="coming-soon-title">右侧功能开发中 ✨</div>
+          <p class="coming-soon-text">快捷指令、文件上传、代码模式等功能<br />将在后续版本陆续开放，敬请期待！</p>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    const messageList = document.querySelector("#messages");
+    const messageForm = document.querySelector("#message-form");
+    const contentInput = document.querySelector("#content");
+    const sendButton = document.querySelector("#send-button");
+    const errorText = document.querySelector("#error");
+
+    function setPrompt(text) { contentInput.value = text; contentInput.focus(); }
+
+    function appendInlineMarkdown(parent, text) {
+      const pattern = /\*\*([^*]+)\*\*|`([^`]+)`/g;
+      let cursor = 0;
+      let match;
+      while ((match = pattern.exec(text)) !== null) {
+        parent.append(document.createTextNode(text.slice(cursor, match.index)));
+        const node = document.createElement(match[1] ? "strong" : "code");
+        node.textContent = match[1] || match[2];
+        parent.append(node);
+        cursor = match.index + match[0].length;
+      }
+      parent.append(document.createTextNode(text.slice(cursor)));
+    }
+
+    function appendHighlightedCode(parent, code) {
+      const pattern = /(#.*$|\/\/.*$|\/\*[\s\S]*?\*\/|"(?:\\.|[^"])*"|'(?:\\.|[^'])*'|\b(?:def|return|if|else|elif|for|while|in|from|import|class|try|except|with|as|True|False|None|const|let|var|function|new|async|await)\b|\b\d+(?:\.\d+)?\b)/gm;
+      let cursor = 0;
+      let match;
+      while ((match = pattern.exec(code)) !== null) {
+        parent.append(document.createTextNode(code.slice(cursor, match.index)));
+        const token = match[0];
+        const span = document.createElement("span");
+        span.className = token.startsWith("#") || token.startsWith("//") || token.startsWith("/*") ? "cm" : /^[\"]/.test(token) ? "str" : /^\d/.test(token) ? "num" : "kw";
+        span.textContent = token;
+        parent.append(span);
+        cursor = match.index + token.length;
+      }
+      parent.append(document.createTextNode(code.slice(cursor)));
+    }
+
+    function appendMarkdown(parent, text) {
+      const lines = text.split("\n");
+      let plain = [];
+      const flushPlain = () => {
+        if (plain.length) {
+          appendInlineMarkdown(parent, plain.join("\n"));
+          plain = [];
+        }
+      };
+
+      for (let index = 0; index < lines.length; index += 1) {
+        const header = lines[index];
+        const separator = lines[index + 1];
+        if (!separator || !header.includes("|") || !/^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(separator)) {
+          plain.push(header);
+          continue;
+        }
+
+        flushPlain();
+        const parseRow = (row) => row.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((cell) => cell.trim());
+        const table = document.createElement("table");
+        table.className = "markdown-table";
+        const thead = document.createElement("thead");
+        const headRow = document.createElement("tr");
+        parseRow(header).forEach((cell) => { const th = document.createElement("th"); th.textContent = cell; headRow.append(th); });
+        thead.append(headRow);
+        const tbody = document.createElement("tbody");
+        index += 2;
+        while (index < lines.length && lines[index].includes("|") && lines[index].trim()) {
+          const row = document.createElement("tr");
+          parseRow(lines[index]).forEach((cell) => { const td = document.createElement("td"); appendInlineMarkdown(td, cell); row.append(td); });
+          tbody.append(row);
+          index += 1;
+        }
+        table.append(thead, tbody);
+        parent.append(table);
+        index -= 1;
+      }
+      flushPlain();
+    }
+
+    function createCodeBlock(language, code) {
+      const windowElement = document.createElement("div");
+      windowElement.className = "code-window";
+
+      const top = document.createElement("div");
+      top.className = "code-top";
+      top.innerHTML = '<span class="traffic"><i></i><i></i><i></i></span>';
+
+      const languageLabel = document.createElement("span");
+      languageLabel.textContent = language || "code";
+      top.append(languageLabel);
+
+      const copyButton = document.createElement("button");
+      copyButton.className = "code-copy";
+      copyButton.type = "button";
+      copyButton.textContent = "复制";
+      copyButton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(code);
+          copyButton.textContent = "已复制";
+          setTimeout(() => { copyButton.textContent = "复制"; }, 1200);
+        } catch {
+          copyButton.textContent = "复制失败";
+        }
+      });
+      top.append(copyButton);
+
+      const pre = document.createElement("pre");
+      const codeElement = document.createElement("code");
+      appendHighlightedCode(codeElement, code);
+      pre.append(codeElement);
+      windowElement.append(top, pre);
+      return windowElement;
+    }
+
+    function renderAssistantContent(content) {
+      const fragment = document.createDocumentFragment();
+      const codePattern = /```([\w+-]*)\s*\n?([\s\S]*?)```/g;
+      let cursor = 0;
+      let match;
+
+      while ((match = codePattern.exec(content)) !== null) {
+        appendMarkdown(fragment, content.slice(cursor, match.index));
+        fragment.append(createCodeBlock(match[1], match[2].replace(/\n$/, "")));
+        cursor = match.index + match[0].length;
+      }
+
+      appendMarkdown(fragment, content.slice(cursor));
+      return fragment;
+    }
+
+    function addMessage(role, content) {
+      const row = document.createElement("div"); row.className = `message ${role}`;
+      const bubble = document.createElement("div"); bubble.className = "bubble";
+      if (role === "assistant") bubble.append(renderAssistantContent(content));
+      else bubble.textContent = content;
+      const wrapper = document.createElement("div"); wrapper.className = "message-content"; wrapper.append(bubble);
+      const avatar = document.createElement("img"); avatar.className = "avatar"; avatar.src = role === "assistant" ? "/assets/avatars/assistant-fox.png" : "/assets/avatars/user.png"; avatar.alt = role === "assistant" ? "FoxChat" : "我";
+      if (role === "assistant") row.append(avatar, wrapper); else row.append(wrapper, avatar);
+      messageList.append(row); messageList.scrollTop = messageList.scrollHeight;
+    }
+    messageForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const content = contentInput.value.trim();
+      if (!content) return;
+
+      sendButton.disabled = true;
+      errorText.textContent = "";
+      addMessage("user", content);
+      contentInput.value = "";
+
+      try {
+        const response = await fetch("/api/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content }),
+        });
+        if (!response.ok) throw new Error("发送消息失败");
+
+        const assistantMessage = await response.json();
+        if (assistantMessage.content) addMessage("assistant", assistantMessage.content);
+        contentInput.focus();
+      } catch (error) {
+        errorText.textContent = error.message;
+      } finally {
+        sendButton.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
